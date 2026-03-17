@@ -1,4 +1,4 @@
-from airflow.sdk import dag, task
+from airflow.sdk import Param, dag, task
 from pendulum import datetime
 
 
@@ -8,6 +8,10 @@ from pendulum import datetime
     start_date=datetime(2026, 1, 1),
     catchup=False,
     tags=["mlops-zoomcamp", "homework"],
+    params={
+        "year": Param(2023, type="integer"),
+        "month": Param(3, type="integer"),
+    },
 )
 def nyc_taxi_training():
     @task.virtualenv(
@@ -20,12 +24,16 @@ def nyc_taxi_training():
         ],
         system_site_packages=False,
     )
-    def train_for_month(year: int, month: int) -> str:
+    def train_for_month(year: str, month: str) -> str:
         from nyc_taxi.nyc_taxi_training import run
 
-        return run(year, month)
+        # Jinja-templated params arrive as strings here, so cast them
+        return run(int(year), int(month))
 
-    train_for_month(year=2023, month=3)
+    train_for_month(
+        year="{{ params.year }}",
+        month="{{ params.month }}",
+    )
 
 
 nyc_taxi_training()

@@ -68,6 +68,8 @@ def train_model(X_train, y_train, X_val, y_val, dv: DictVectorizer) -> str:
 
 
 def run(year: int, month: int) -> str:
+    print(f"Running training for year={year}, month={month}")
+
     df_train = read_dataframe(year, month)
 
     next_year = year if month < 12 else year + 1
